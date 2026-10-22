@@ -68,21 +68,23 @@ light mode (4.39:1 and 4.43:1) and for red in dark mode (4.42:1). The tests list
 
 ## Development
 
-Use Node.js 26 and install dependencies with `npm ci`.
+Use Node.js 26 and install dependencies with `npm ci`. The scripts and tests are TypeScript,
+which Node.js runs directly by stripping the types.
 
 - `npm run build`: compile `dist/bootstrap-flexoki.css` and `dist/flexoki.css`, then prefix
   custom properties with `--bs-` as Bootstrap's build does.
 - `npm run demo:build`: build the demo site in `_site/`.
 - `npm run demo`: build the demo, then serve it at <http://localhost:9001/>.
 - `npm run tokens:sync`: regenerate `src/_tokens.scss` from the Flexoki commit pinned in
-  `scripts/sync-tokens.js`. Pass a path to a local `flexoki.css` to use that instead.
+  `scripts/sync-tokens.ts`. Pass a path to a local `flexoki.css` to use that instead.
 - `npm run format:fix`: format files with Oxfmt.
 - `npm run format:test`: check formatting without writing files.
-- `npm run lint:fix`: fix SCSS lint problems where Stylelint supports it.
-- `npm run lint:test`: check SCSS with the standard SCSS configuration.
+- `npm run lint:fix`: fix lint problems where Stylelint and Oxlint support it.
+- `npm run lint:test`: check SCSS with the standard SCSS configuration and TypeScript with Oxlint.
+- `npm run types:test`: type check the scripts and tests with TypeScript.
 - `npm run unit:test`: check the tokens, the color mapping and contrast.
-- `npm run fix`: fix SCSS lint problems, then format files.
-- `npm test`: run the build, formatting, lint and unit checks through Wireit.
+- `npm run fix`: fix lint problems, then format files.
+- `npm test`: run the build, formatting, lint, type and unit checks through Wireit.
 
 The demo is Bootstrap's [cheatsheet](https://getbootstrap.com/docs/6.0/examples/cheatsheet/),
 which shows every component, with a light and dark mode toggle. `npm run demo:build` downloads
