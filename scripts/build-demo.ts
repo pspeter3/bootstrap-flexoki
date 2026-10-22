@@ -8,7 +8,7 @@ import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 const BASE = "https://getbootstrap.com/docs/6.0";
 const PAGE = `${BASE}/examples/cheatsheet/`;
 const OUTPUT = new URL("../_site/", import.meta.url);
-const BOOTSTRAP_JS = new URL("../node_modules/bootstrap/dist/js/", import.meta.url);
+const BOOTSTRAP = new URL("../node_modules/bootstrap/dist/", import.meta.url);
 const NOTICE =
   `Bootstrap's cheatsheet example (${PAGE}), copyright the Bootstrap Authors and ` +
   "licensed under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). " +
@@ -36,14 +36,17 @@ function version(banner: string): string | undefined {
   return banner.match(/Bootstrap v(\S+)/)?.[1];
 }
 
-const installed = version(await readFile(new URL("bootstrap.bundle.min.js", BOOTSTRAP_JS), "utf8"));
+const installed = version(await readFile(new URL("js/bootstrap.bundle.min.js", BOOTSTRAP), "utf8"));
 const published = version(await download(`${BASE}/dist/js/bootstrap.bundle.min.js`));
 if (installed !== published) {
   throw new Error(`getbootstrap.com has Bootstrap ${published}, but ${installed} is installed`);
 }
 
 const rewrites: [string | RegExp, string][] = [
-  ["/docs/6.0/dist/css/bootstrap.min.css", "bootstrap-flexoki.css"],
+  [
+    '<link href="/docs/6.0/dist/css/bootstrap.min.css" rel="stylesheet">',
+    '<link href="bootstrap.min.css" rel="stylesheet"><link href="bootstrap-flexoki.css" rel="stylesheet">',
+  ],
   // Import maps need a ./ prefix on relative URLs.
   ["/docs/6.0/dist/js/bootstrap.bundle.min.js", "./bootstrap.bundle.min.js"],
   ["/docs/6.0/examples/cheatsheet/", ""],
@@ -81,7 +84,12 @@ await copyFile(
   new URL("../dist/bootstrap-flexoki.css", import.meta.url),
   new URL("bootstrap-flexoki.css", OUTPUT),
 );
-for (const name of ["bootstrap.bundle.min.js", "bootstrap.bundle.min.js.map"]) {
-  await copyFile(new URL(name, BOOTSTRAP_JS), new URL(name, OUTPUT));
+for (const path of [
+  "css/bootstrap.min.css",
+  "css/bootstrap.min.css.map",
+  "js/bootstrap.bundle.min.js",
+  "js/bootstrap.bundle.min.js.map",
+]) {
+  await copyFile(new URL(path, BOOTSTRAP), new URL(path.split("/").at(-1)!, OUTPUT));
 }
 console.log(`Built the demo for Bootstrap ${installed} in _site/`);

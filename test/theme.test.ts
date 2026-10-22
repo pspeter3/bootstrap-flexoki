@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
+import { parse, type Declaration } from "postcss";
+import { declarationKey } from "../scripts/css.ts";
 import { HUES, SHADES, stop } from "../scripts/palette.ts";
 
 const REMOVED_HUES = ["indigo", "violet", "pink", "amber", "lime", "teal", "brown", "pewter"];
@@ -26,7 +28,8 @@ const CONTRAST_EXCEPTIONS: Record<string, number> = {
 
 type Mode = "light" | "dark";
 
-// Tests run against the build output, after PostCSS adds the --bs- prefix.
+// Tests run against the build output loaded after Bootstrap's own CSS.
+const bootstrap = await readFile("node_modules/bootstrap/dist/css/bootstrap.css", "utf8");
 const theme = await readFile("dist/bootstrap-flexoki.css", "utf8");
 const palette = await readFile("dist/flexoki.css", "utf8");
 const tokens: Record<string, string> = Object.fromEntries(
@@ -35,11 +38,25 @@ const tokens: Record<string, string> = Object.fromEntries(
   ].map(([, name, value]) => [name, value]),
 );
 
-// The first declaration of each custom property, which for colors is :root. The --bs-
-// prefix is dropped so tests can use the names from Bootstrap's Sass.
-const properties: Record<string, string> = {};
-for (const [, name, value] of theme.matchAll(/--bs-([a-z0-9-]+):\s*([^;]+);/g)) {
-  properties[`--${name}`] ??= value.replaceAll("var(--bs-", "var(--").trim();
+// The first declaration of each custom property, which for colors is :root, with the
+// theme's replacing Bootstrap's. The --bs- prefix is dropped so tests can use the names
+// from Bootstrap's Sass.
+function firstProperties(css: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  for (const [, name, value] of css.matchAll(/--bs-([a-z0-9-]+):\s*([^;]+);/g)) {
+    result[`--${name}`] ??= value.replaceAll("var(--bs-", "var(--").trim();
+  }
+  return result;
+}
+const properties = { ...firstProperties(bootstrap), ...firstProperties(theme) };
+
+// Every declaration, keyed by its property and the rules and at-rules around it.
+function declarations(css: string): Map<string, Declaration> {
+  const result = new Map<string, Declaration>();
+  parse(css).walkDecls((declaration) => {
+    result.set(declarationKey(declaration), declaration);
+  });
+  return result;
 }
 
 function splitArguments(value: string): string[] {
@@ -142,9 +159,25 @@ test("custom properties use Bootstrap's --bs- prefix", () => {
   assert.doesNotMatch(theme, /var\(--(?!bs-)/);
 });
 
-test("Bootstrap hues without a Flexoki counterpart are removed", () => {
+test("the theme only overrides custom properties", () => {
+  for (const [id, declaration] of declarations(theme)) {
+    assert.ok(declaration.prop.startsWith("--"), id);
+  }
+});
+
+test("Bootstrap hues without a Flexoki counterpart are unused", () => {
+  const overrides = declarations(theme);
+  const stock = declarations(bootstrap);
   for (const hue of REMOVED_HUES) {
-    assert.doesNotMatch(theme, new RegExp(`--${hue}-`), hue);
+    assert.doesNotMatch(theme, new RegExp(`--bs-${hue}-`), hue);
+    for (const [id, declaration] of stock) {
+      if (
+        declaration.value.includes(`var(--bs-${hue}-`) &&
+        !declaration.prop.startsWith(`--bs-${hue}-`)
+      ) {
+        assert.ok(overrides.has(id), `${id} uses ${hue}`);
+      }
+    }
   }
 });
 
