@@ -5,7 +5,7 @@ import { test } from "node:test";
 const HUES = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "magenta"];
 const SHADES = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 850, 900, 950];
 const REMOVED_HUES = ["indigo", "violet", "pink", "amber", "lime", "teal", "brown", "pewter"];
-const THEME_COLORS = {
+const THEME_COLORS: Record<string, string> = {
   primary: "blue",
   accent: "purple",
   success: "green",
@@ -16,7 +16,7 @@ const THEME_COLORS = {
 
 // Flexoki's recommended shades fall just short of WCAG AA (4.5:1) here. Each
 // entry is the lowest ratio the pairing is allowed to reach.
-const CONTRAST_EXCEPTIONS = {
+const CONTRAST_EXCEPTIONS: Record<string, number> = {
   "light success-contrast on success-bg": 4.39,
   "light info-contrast on info-bg": 4.43,
   "light success-fg on bg-body": 4.39,
@@ -25,10 +25,12 @@ const CONTRAST_EXCEPTIONS = {
   "dark danger-fg on bg-body": 4.42,
 };
 
+type Mode = "light" | "dark";
+
 // Tests run against the build output, after PostCSS adds the --bs- prefix.
 const theme = await readFile("dist/bootstrap-flexoki.css", "utf8");
 const palette = await readFile("dist/flexoki.css", "utf8");
-const tokens = Object.fromEntries(
+const tokens: Record<string, string> = Object.fromEntries(
   [
     ...(await readFile("src/_tokens.scss", "utf8")).matchAll(/^\$([a-z0-9-]+): (#[0-9a-f]{6});$/gm),
   ].map(([, name, value]) => [name, value]),
@@ -36,17 +38,17 @@ const tokens = Object.fromEntries(
 
 // The first declaration of each custom property, which for colors is :root. The --bs-
 // prefix is dropped so tests can use the names from Bootstrap's Sass.
-const properties = {};
+const properties: Record<string, string> = {};
 for (const [, name, value] of theme.matchAll(/--bs-([a-z0-9-]+):\s*([^;]+);/g)) {
   properties[`--${name}`] ??= value.replaceAll("var(--bs-", "var(--").trim();
 }
 
-function stop(shade) {
+function stop(shade: number): string {
   return shade < 100 ? `0${shade}` : `${shade}`;
 }
 
-function splitArguments(value) {
-  const parts = [];
+function splitArguments(value: string): string[] {
+  const parts: string[] = [];
   let depth = 0;
   let start = 0;
   for (let i = 0; i < value.length; i++) {
@@ -61,7 +63,7 @@ function splitArguments(value) {
 }
 
 // Resolves a custom property to a hex color for one color scheme.
-function resolve(value, mode) {
+function resolve(value: string, mode: Mode): string {
   value = value.trim();
   if (/^#[0-9a-f]{6}$/i.test(value)) {
     return value.toLowerCase();
@@ -79,20 +81,20 @@ function resolve(value, mode) {
   throw new Error(`Cannot resolve ${value}`);
 }
 
-function luminance(hex) {
+function luminance(hex: string): number {
   const channels = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
   const [r, g, b] = channels.map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
-function contrast(a, b) {
-  const [lighter, darker] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+function contrast(a: string, b: string): number {
+  const [lighter, darker] = [luminance(a), luminance(b)].toSorted((x, y) => y - x);
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-const shortfalls = new Set();
+const shortfalls = new Set<string>();
 
-function assertContrast(mode, foreground, background) {
+function assertContrast(mode: Mode, foreground: string, background: string): void {
   const label = `${mode} ${foreground} on ${background}`;
   const ratio = contrast(
     resolve(`var(--${foreground})`, mode),
@@ -128,7 +130,7 @@ test("tokens match stephango.com/flexoki", () => {
 test("Bootstrap color tokens use exact Flexoki shades", () => {
   assert.equal(properties["--white"], tokens.paper);
   assert.equal(properties["--black"], tokens.black);
-  for (const [hue, source] of [["gray", "base"], ...HUES.map((hue) => [hue, hue])]) {
+  for (const [hue, source] of [["gray", "base"], ...HUES.map((accent) => [accent, accent])]) {
     for (const shade of SHADES) {
       assert.equal(
         properties[`--${hue}-${stop(shade)}`],
@@ -169,7 +171,7 @@ test("theme colors use 600 in light mode and 400 in dark mode", () => {
 });
 
 test("surfaces and text follow Flexoki's recommended shades", () => {
-  const roles = {
+  const roles: Record<string, [string, string]> = {
     "bg-body": ["paper", "black"],
     "bg-1": ["base-50", "base-950"],
     "bg-2": ["base-100", "base-900"],
@@ -187,7 +189,7 @@ test("surfaces and text follow Flexoki's recommended shades", () => {
 });
 
 test("text meets WCAG AA contrast", () => {
-  for (const mode of ["light", "dark"]) {
+  for (const mode of ["light", "dark"] as const) {
     for (const level of ["body", "1", "2", "3"]) {
       assertContrast(mode, `fg-${level}`, "bg-body");
     }
@@ -197,7 +199,7 @@ test("text meets WCAG AA contrast", () => {
       assertContrast(mode, `${name}-fg-emphasis`, `${name}-bg-subtle`);
     }
   }
-  assert.deepEqual([...shortfalls].sort(), Object.keys(CONTRAST_EXCEPTIONS).sort());
+  assert.deepEqual([...shortfalls].toSorted(), Object.keys(CONTRAST_EXCEPTIONS).toSorted());
 });
 
 test("palette stylesheet exposes every token", () => {

@@ -29,11 +29,12 @@
     "fix": "wireit",
     "test": "wireit",
     "prepack": "wireit",
-    "tokens:sync": "node scripts/sync-tokens.js",
+    "tokens:sync": "node scripts/sync-tokens.ts",
     "format:fix": "wireit",
     "format:test": "wireit",
     "lint:fix": "wireit",
     "lint:test": "wireit",
+    "types:test": "wireit",
     "unit:test": "wireit"
   },
   "wireit": {
@@ -60,6 +61,7 @@
       "dependencies": [
         "format:test",
         "lint:test",
+        "types:test",
         "unit:test"
       ]
     },
@@ -74,14 +76,26 @@
       "output": []
     },
     "lint:fix": {
-      "command": "stylelint \"**/*.scss\" --ignore-path .gitignore --allow-empty-input --fix"
+      "command": "stylelint \"**/*.scss\" --ignore-path .gitignore --allow-empty-input --fix && oxlint --fix"
     },
     "lint:test": {
-      "command": "stylelint \"**/*.scss\" --ignore-path .gitignore --allow-empty-input",
+      "command": "stylelint \"**/*.scss\" --ignore-path .gitignore --allow-empty-input && oxlint",
       "files": [
         "**/*.scss",
+        "**/*.{js,ts}",
+        "!node_modules/**",
         ".stylelintrc.json",
+        ".oxlintrc.json",
         ".gitignore"
+      ],
+      "output": []
+    },
+    "types:test": {
+      "command": "tsc",
+      "files": [
+        "scripts/**/*.ts",
+        "test/**/*.ts",
+        "tsconfig.json"
       ],
       "output": []
     },
@@ -91,7 +105,7 @@
         "build"
       ],
       "files": [
-        "test/**/*.js"
+        "test/**/*.ts"
       ],
       "output": []
     },
@@ -103,12 +117,12 @@
       ]
     },
     "demo:build": {
-      "command": "node scripts/build-demo.js",
+      "command": "node scripts/build-demo.ts",
       "dependencies": [
         "build"
       ],
       "files": [
-        "scripts/build-demo.js",
+        "scripts/build-demo.ts",
         "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js*"
       ],
       "output": [
@@ -117,8 +131,10 @@
     }
   },
   "devDependencies": {
+    "@types/node": "^26.6.5",
     "bootstrap": "6.0.0-alpha.1",
     "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
     "postcss": "^8.5.31",
     "postcss-cli": "^12.0.0",
     "postcss-prefix-custom-properties": "^0.1.0",
@@ -126,6 +142,7 @@
     "sirv-cli": "^3.0.1",
     "stylelint": "^17.16.0",
     "stylelint-config-standard-scss": "^17.0.0",
+    "typescript": "^7.0.2",
     "wireit": "^0.14.13"
   },
   "peerDependencies": {

@@ -1,6 +1,6 @@
 // Builds the demo site in _site/ from Bootstrap's cheatsheet example and this theme.
 //
-// Usage: node scripts/build-demo.js
+// Usage: node scripts/build-demo.ts
 // Run `npm run build` first. The cheatsheet is downloaded from getbootstrap.com, which must
 // publish the same Bootstrap version as the one installed.
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
@@ -12,9 +12,9 @@ const BOOTSTRAP_JS = new URL("../node_modules/bootstrap/dist/js/", import.meta.u
 const NOTICE =
   `Bootstrap's cheatsheet example (${PAGE}), copyright the Bootstrap Authors and ` +
   "licensed under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). " +
-  "Modified by scripts/build-demo.js to use bootstrap-flexoki.";
+  "Modified by scripts/build-demo.ts to use bootstrap-flexoki.";
 
-async function download(url) {
+async function download(url: string): Promise<string> {
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Failed to download ${url}: ${response.status}`);
@@ -23,7 +23,7 @@ async function download(url) {
 }
 
 // Replaces every match, failing if there are none so upstream changes aren't missed.
-function rewrite(html, pattern, replacement) {
+function rewrite(html: string, pattern: string | RegExp, replacement: string): string {
   if (typeof pattern === "string" ? !html.includes(pattern) : !pattern.test(html)) {
     throw new Error(`Cheatsheet no longer contains ${pattern}`);
   }
@@ -32,7 +32,7 @@ function rewrite(html, pattern, replacement) {
     : html.replace(pattern, replacement);
 }
 
-function version(banner) {
+function version(banner: string): string | undefined {
   return banner.match(/Bootstrap v(\S+)/)?.[1];
 }
 
@@ -42,7 +42,7 @@ if (installed !== published) {
   throw new Error(`getbootstrap.com has Bootstrap ${published}, but ${installed} is installed`);
 }
 
-const rewrites = [
+const rewrites: [string | RegExp, string][] = [
   ["/docs/6.0/dist/css/bootstrap.min.css", "bootstrap-flexoki.css"],
   // Import maps need a ./ prefix on relative URLs.
   ["/docs/6.0/dist/js/bootstrap.bundle.min.js", "./bootstrap.bundle.min.js"],
@@ -65,7 +65,7 @@ for (const [pattern, replacement] of rewrites) {
   html = rewrite(html, pattern, replacement);
 }
 
-const files = {
+const files: Record<string, string> = {
   "index.html": html,
   "cheatsheet.css": `/* ${NOTICE} */\n${await download(`${PAGE}cheatsheet.css`)}`,
   "cheatsheet.js": `/* ${NOTICE} */\n${await download(`${PAGE}cheatsheet.js`)}`,
