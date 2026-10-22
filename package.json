@@ -11,13 +11,57 @@
   "bugs": {
     "url": "https://github.com/pspeter3/bootstrap-flexoki/issues"
   },
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pspeter3/bootstrap-flexoki.git"
   },
-  "license": "MIT",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "fix": "wireit",
+    "test": "wireit",
+    "format:fix": "wireit",
+    "format:test": "wireit",
+    "lint:fix": "wireit",
+    "lint:test": "wireit"
+  },
+  "wireit": {
+    "fix": {
+      "command": "npm run lint:fix && npm run format:fix"
+    },
+    "test": {
+      "dependencies": [
+        "format:test",
+        "lint:test"
+      ]
+    },
+    "format:fix": {
+      "command": "oxfmt --write ."
+    },
+    "format:test": {
+      "command": "oxfmt --check .",
+      "files": [
+        "**/*"
+      ],
+      "output": []
+    },
+    "lint:fix": {
+      "command": "stylelint \"**/*.scss\" --ignore-path .gitignore --allow-empty-input --fix"
+    },
+    "lint:test": {
+      "command": "stylelint \"**/*.scss\" --ignore-path .gitignore --allow-empty-input",
+      "files": [
+        "**/*.scss",
+        ".stylelintrc.json",
+        ".gitignore"
+      ],
+      "output": []
+    }
+  },
+  "devDependencies": {
+    "oxfmt": "^0.74.0",
+    "stylelint": "^17.16.0",
+    "stylelint-config-standard-scss": "^17.0.0",
+    "wireit": "^0.14.13"
   }
 }
