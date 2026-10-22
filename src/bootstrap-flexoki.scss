@@ -1,0 +1,19 @@
+@use "colors";
+@use "theme";
+@use "tokens";
+
+// Every value is !default so projects can pass their own through this module,
+// e.g. a map.merge() of theme.$theme-colors.
+@forward "bootstrap/scss/bootstrap" with (
+  $white: colors.$white !default,
+  $black: colors.$black !default,
+  $colors: colors.$colors !default,
+  $color-tokens: colors.$color-tokens !default,
+  $color-contrast-dark: tokens.$black !default,
+  $color-contrast-light: tokens.$paper !default,
+  $theme-colors: theme.$theme-colors !default,
+  $theme-bgs: theme.$theme-bgs !default,
+  $theme-fgs: theme.$theme-fgs !default,
+  $theme-borders: theme.$theme-borders !default,
+  $root-tokens: theme.$root-tokens !default
+);

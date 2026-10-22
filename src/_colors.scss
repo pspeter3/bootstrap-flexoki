@@ -1,0 +1,51 @@
+@use "sass:map";
+@use "tokens";
+
+// Bootstrap mixes its tints and shades toward these, so the 025 and 975 stops
+// that Flexoki doesn't define stay warm.
+$white: tokens.$paper;
+$black: tokens.$black;
+
+// Bootstrap hues without a Flexoki counterpart are removed with null.
+$colors: (
+  "indigo": null,
+  "violet": null,
+  "pink": null,
+  "amber": null,
+  "lime": null,
+  "teal": null,
+  "brown": null,
+  "pewter": null,
+  "gray": map.get(tokens.$base, 500),
+);
+
+@each $hue, $shades in tokens.$accents {
+  $colors: map.set($colors, $hue, map.get($shades, 500));
+}
+
+// Bootstrap names its 50 stop "050".
+@function stop($shade) {
+  @if $shade < 100 {
+    @return "0#{$shade}";
+  }
+
+  @return "#{$shade}";
+}
+
+// Replace Bootstrap's mixed stops with every Flexoki shade. Flexoki's 150 and
+// 850 have no Bootstrap stop, so they're added as extra tokens.
+$palettes: map.merge(
+  (
+    "gray": tokens.$base,
+  ),
+  tokens.$accents
+);
+$color-tokens: ();
+
+@each $hue, $shades in $palettes {
+  @each $shade, $value in $shades {
+    $color-tokens: map.set($color-tokens, --#{$hue}-#{stop($shade)}, $value);
+  }
+}
+
+$color-tokens: map.set($color-tokens, --gray-975, tokens.$black);

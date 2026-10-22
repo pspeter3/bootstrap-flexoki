@@ -16,23 +16,51 @@
     "type": "git",
     "url": "git+https://github.com/pspeter3/bootstrap-flexoki.git"
   },
+  "style": "dist/bootstrap-flexoki.css",
+  "files": [
+    "dist",
+    "src"
+  ],
   "type": "module",
   "scripts": {
+    "build": "wireit",
+    "demo": "wireit",
+    "demo:build": "wireit",
     "fix": "wireit",
     "test": "wireit",
+    "prepack": "wireit",
+    "tokens:sync": "node scripts/sync-tokens.js",
     "format:fix": "wireit",
     "format:test": "wireit",
     "lint:fix": "wireit",
-    "lint:test": "wireit"
+    "lint:test": "wireit",
+    "unit:test": "wireit"
   },
   "wireit": {
+    "build": {
+      "command": "sass --load-path=node_modules --quiet-deps --no-source-map src/bootstrap-flexoki.scss:dist/bootstrap-flexoki.css src/flexoki.scss:dist/flexoki.css && postcss --replace dist/bootstrap-flexoki.css dist/flexoki.css",
+      "files": [
+        "src/**/*.scss",
+        "postcss.config.js",
+        "node_modules/bootstrap/scss/**/*.scss"
+      ],
+      "output": [
+        "dist/**"
+      ]
+    },
+    "prepack": {
+      "dependencies": [
+        "build"
+      ]
+    },
     "fix": {
       "command": "npm run lint:fix && npm run format:fix"
     },
     "test": {
       "dependencies": [
         "format:test",
-        "lint:test"
+        "lint:test",
+        "unit:test"
       ]
     },
     "format:fix": {
@@ -56,12 +84,52 @@
         ".gitignore"
       ],
       "output": []
+    },
+    "unit:test": {
+      "command": "node --test",
+      "dependencies": [
+        "build"
+      ],
+      "files": [
+        "test/**/*.js"
+      ],
+      "output": []
+    },
+    "demo": {
+      "command": "sirv _site --dev --port 9001",
+      "service": true,
+      "dependencies": [
+        "demo:build"
+      ]
+    },
+    "demo:build": {
+      "command": "node scripts/build-demo.js",
+      "dependencies": [
+        "build"
+      ],
+      "files": [
+        "scripts/build-demo.js",
+        "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js*"
+      ],
+      "output": [
+        "_site/**"
+      ]
     }
   },
   "devDependencies": {
+    "bootstrap": "6.0.0-alpha.1",
     "oxfmt": "^0.74.0",
+    "postcss": "^8.5.31",
+    "postcss-cli": "^12.0.0",
+    "postcss-prefix-custom-properties": "^0.1.0",
+    "sass": "^1.106.1",
+    "sirv-cli": "^3.0.1",
     "stylelint": "^17.16.0",
     "stylelint-config-standard-scss": "^17.0.0",
     "wireit": "^0.14.13"
-  }
+  },
+  "peerDependencies": {
+    "bootstrap": "6.0.0-alpha.1"
+  },
+  "sass": "src/bootstrap-flexoki.scss"
 }
