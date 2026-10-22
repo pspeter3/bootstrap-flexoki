@@ -25,6 +25,7 @@
   "scripts": {
     "build": "wireit",
     "demo": "wireit",
+    "demo:build": "wireit",
     "fix": "wireit",
     "test": "wireit",
     "prepack": "wireit",
@@ -33,8 +34,7 @@
     "format:test": "wireit",
     "lint:fix": "wireit",
     "lint:test": "wireit",
-    "unit:test": "wireit",
-    "demo:sync": "node scripts/sync-cheatsheet.js"
+    "unit:test": "wireit"
   },
   "wireit": {
     "build": {
@@ -96,10 +96,23 @@
       "output": []
     },
     "demo": {
-      "command": "sirv . --dev --port 9001",
+      "command": "sirv _site --dev --port 9001",
       "service": true,
       "dependencies": [
+        "demo:build"
+      ]
+    },
+    "demo:build": {
+      "command": "node scripts/build-demo.js",
+      "dependencies": [
         "build"
+      ],
+      "files": [
+        "scripts/build-demo.js",
+        "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js*"
+      ],
+      "output": [
+        "_site/**"
       ]
     }
   },

@@ -72,10 +72,8 @@ Use Node.js 26 and install dependencies with `npm ci`.
 
 - `npm run build`: compile `dist/bootstrap-flexoki.css` and `dist/flexoki.css`, then prefix
   custom properties with `--bs-` as Bootstrap's build does.
-- `npm run demo`: build, then serve the repository at <http://localhost:9001/demo/>.
-- `npm run demo:sync`: download Bootstrap's
-  [cheatsheet](https://getbootstrap.com/docs/6.0/examples/cheatsheet/) into `demo/` and point it
-  at this theme.
+- `npm run demo:build`: build the demo site in `_site/`.
+- `npm run demo`: build the demo, then serve it at <http://localhost:9001/>.
 - `npm run tokens:sync`: regenerate `src/_tokens.scss` from the Flexoki commit pinned in
   `scripts/sync-tokens.js`. Pass a path to a local `flexoki.css` to use that instead.
 - `npm run format:fix`: format files with Oxfmt.
@@ -86,6 +84,11 @@ Use Node.js 26 and install dependencies with `npm ci`.
 - `npm run fix`: fix SCSS lint problems, then format files.
 - `npm test`: run the build, formatting, lint and unit checks through Wireit.
 
-The demo is Bootstrap's cheatsheet, which shows every component, with a light and dark mode
-toggle. It's copyright the Bootstrap Authors and licensed under
+The demo is Bootstrap's [cheatsheet](https://getbootstrap.com/docs/6.0/examples/cheatsheet/),
+which shows every component, with a light and dark mode toggle. `npm run demo:build` downloads
+it, checks that getbootstrap.com publishes the installed Bootstrap version, and points it at this
+theme. The cheatsheet is copyright the Bootstrap Authors and licensed under
 [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
+
+Pushes to `main` that pass the tests deploy the demo to GitHub Pages. In the repository's
+Settings → Pages, set the source to GitHub Actions.
