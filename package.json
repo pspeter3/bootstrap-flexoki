@@ -1,0 +1,23 @@
+{
+  "name": "bootstrap-flexoki",
+  "version": "0.0.0",
+  "description": "Bootstrap Flexoki theme",
+  "keywords": [
+    "bootstrap",
+    "flexoki",
+    "theme"
+  ],
+  "homepage": "https://github.com/pspeter3/bootstrap-flexoki#readme",
+  "bugs": {
+    "url": "https://github.com/pspeter3/bootstrap-flexoki/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pspeter3/bootstrap-flexoki.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
