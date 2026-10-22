@@ -1,0 +1,7 @@
+{
+  "plugins": {
+    "postcss-prefix-custom-properties": {
+      "prefix": "bs-"
+    }
+  }
+}

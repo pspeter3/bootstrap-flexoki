@@ -39,10 +39,10 @@
   },
   "wireit": {
     "build": {
-      "command": "sass --load-path=node_modules --quiet-deps --no-source-map src/bootstrap-flexoki.scss:dist/bootstrap-flexoki.css src/flexoki.scss:dist/flexoki.css && postcss --replace dist/bootstrap-flexoki.css dist/flexoki.css",
+      "command": "sass --load-path=node_modules --quiet-deps --no-source-map src/bootstrap-flexoki.scss:dist/bootstrap-flexoki.css src/flexoki.scss:dist/flexoki.css && postcss --replace dist/bootstrap-flexoki.css",
       "files": [
         "src/**/*.scss",
-        "postcss.config.js",
+        ".postcssrc.json",
         "node_modules/bootstrap/scss/**/*.scss"
       ],
       "output": [
@@ -82,7 +82,7 @@
       "command": "stylelint \"**/*.scss\" --ignore-path .gitignore --allow-empty-input && oxlint",
       "files": [
         "**/*.scss",
-        "**/*.{js,ts}",
+        "**/*.ts",
         "!node_modules/**",
         ".stylelintrc.json",
         ".oxlintrc.json",
