@@ -13,12 +13,16 @@ npm install bootstrap@6.0.0-alpha.1 bootstrap-flexoki
 
 ### CSS
 
-Use the theme's stylesheet in place of Bootstrap's, and Bootstrap's JavaScript as usual:
+Load the theme after Bootstrap's stylesheet, and Bootstrap's JavaScript as usual:
 
 ```html
+<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
 <link rel="stylesheet" href="node_modules/bootstrap-flexoki/dist/bootstrap-flexoki.css" />
 <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 ```
+
+The theme only overrides Bootstrap's custom properties, so it works with `bootstrap.css` or
+`bootstrap.min.css`, from npm or a CDN.
 
 ### Sass
 
@@ -47,8 +51,9 @@ theme's map. For example, to make cyan the primary color:
 );
 ```
 
-Sass output has no `--bs-` prefix on custom properties, and Bootstrap's JavaScript needs it.
-Add it with [postcss-prefix-custom-properties](https://www.npmjs.com/package/postcss-prefix-custom-properties):
+Bootstrap 6's Sass writes custom properties without the `--bs-` prefix, and Bootstrap adds it
+in its own build. Its JavaScript reads the prefixed names, so add the prefix the same way, with
+[postcss-prefix-custom-properties](https://www.npmjs.com/package/postcss-prefix-custom-properties):
 
 ```json
 { "plugins": { "postcss-prefix-custom-properties": { "prefix": "bs-" } } }
@@ -83,6 +88,9 @@ Text on green and cyan in light mode, and on red in dark mode, falls just short 
 
 Use Node.js 26, then `npm ci`.
 
+- `npm run build`: compile the theme and stock Bootstrap from Sass, and write the declarations
+  that differ to `dist/bootstrap-flexoki.css`. The build fails if anything besides a custom
+  property differs.
 - `npm test`: build, then run format, lint, type and unit checks.
 - `npm run fix`: fix lint and formatting.
 - `npm run demo`: serve Bootstrap's [cheatsheet](https://getbootstrap.com/docs/6.0/examples/cheatsheet/)
