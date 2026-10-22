@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
-import { compile } from "sass";
 
 const HUES = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "magenta"];
 const SHADES = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 850, 900, 950];
@@ -26,19 +25,20 @@ const CONTRAST_EXCEPTIONS = {
   "dark danger-fg on bg-body": 4.42,
 };
 
-const options = { loadPaths: ["node_modules"], quietDeps: true };
-const theme = compile("src/bootstrap-flexoki.scss", options).css;
-const palette = compile("src/flexoki.scss", options).css;
+// Tests run against the build output, after PostCSS adds the --bs- prefix.
+const theme = await readFile("dist/bootstrap-flexoki.css", "utf8");
+const palette = await readFile("dist/flexoki.css", "utf8");
 const tokens = Object.fromEntries(
   [
     ...(await readFile("src/_tokens.scss", "utf8")).matchAll(/^\$([a-z0-9-]+): (#[0-9a-f]{6});$/gm),
   ].map(([, name, value]) => [name, value]),
 );
 
-// The first declaration of each custom property, which for colors is :root.
+// The first declaration of each custom property, which for colors is :root. The --bs-
+// prefix is dropped so tests can use the names from Bootstrap's Sass.
 const properties = {};
-for (const [, name, value] of theme.matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)) {
-  properties[name] ??= value.trim();
+for (const [, name, value] of theme.matchAll(/--bs-([a-z0-9-]+):\s*([^;]+);/g)) {
+  properties[`--${name}`] ??= value.replaceAll("var(--bs-", "var(--").trim();
 }
 
 function stop(shade) {
@@ -138,6 +138,11 @@ test("Bootstrap color tokens use exact Flexoki shades", () => {
     }
   }
   assert.equal(properties["--gray-975"], tokens.black);
+});
+
+test("custom properties use Bootstrap's --bs- prefix", () => {
+  assert.doesNotMatch(theme, /(?<![\w-])--(?!bs-)[a-z][a-z0-9-]*:/);
+  assert.doesNotMatch(theme, /var\(--(?!bs-)/);
 });
 
 test("Bootstrap hues without a Flexoki counterpart are removed", () => {

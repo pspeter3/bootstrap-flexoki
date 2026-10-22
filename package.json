@@ -24,6 +24,7 @@
   "type": "module",
   "scripts": {
     "build": "wireit",
+    "demo": "wireit",
     "fix": "wireit",
     "test": "wireit",
     "prepack": "wireit",
@@ -32,13 +33,15 @@
     "format:test": "wireit",
     "lint:fix": "wireit",
     "lint:test": "wireit",
-    "unit:test": "wireit"
+    "unit:test": "wireit",
+    "demo:sync": "node scripts/sync-cheatsheet.js"
   },
   "wireit": {
     "build": {
-      "command": "sass --load-path=node_modules --quiet-deps --no-source-map src/bootstrap-flexoki.scss:dist/bootstrap-flexoki.css src/flexoki.scss:dist/flexoki.css",
+      "command": "sass --load-path=node_modules --quiet-deps --no-source-map src/bootstrap-flexoki.scss:dist/bootstrap-flexoki.css src/flexoki.scss:dist/flexoki.css && postcss --replace dist/bootstrap-flexoki.css dist/flexoki.css",
       "files": [
         "src/**/*.scss",
+        "postcss.config.js",
         "node_modules/bootstrap/scss/**/*.scss"
       ],
       "output": [
@@ -55,7 +58,6 @@
     },
     "test": {
       "dependencies": [
-        "build",
         "format:test",
         "lint:test",
         "unit:test"
@@ -85,18 +87,30 @@
     },
     "unit:test": {
       "command": "node --test",
+      "dependencies": [
+        "build"
+      ],
       "files": [
-        "src/**/*.scss",
-        "test/**/*.js",
-        "node_modules/bootstrap/scss/**/*.scss"
+        "test/**/*.js"
       ],
       "output": []
+    },
+    "demo": {
+      "command": "sirv . --dev --port 9001",
+      "service": true,
+      "dependencies": [
+        "build"
+      ]
     }
   },
   "devDependencies": {
     "bootstrap": "6.0.0-alpha.1",
     "oxfmt": "^0.74.0",
+    "postcss": "^8.5.31",
+    "postcss-cli": "^12.0.0",
+    "postcss-prefix-custom-properties": "^0.1.0",
     "sass": "^1.106.1",
+    "sirv-cli": "^3.0.1",
     "stylelint": "^17.16.0",
     "stylelint-config-standard-scss": "^17.0.0",
     "wireit": "^0.14.13"

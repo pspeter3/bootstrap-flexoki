@@ -14,8 +14,12 @@ Use the compiled stylesheet in place of Bootstrap's:
 <link rel="stylesheet" href="node_modules/bootstrap-flexoki/dist/bootstrap-flexoki.css" />
 ```
 
+Like Bootstrap's own stylesheet, its custom properties use the `--bs-` prefix (`--bs-blue-600`),
+which Bootstrap's JavaScript relies on.
+
 Or compile it with Sass, adding `node_modules` to your load paths. The module forwards
-Bootstrap, so you can configure it the same way:
+Bootstrap, so you can configure it the same way. As with Bootstrap, Sass output has no
+`--bs-` prefix: run the same PostCSS step as `postcss.config.js` to add it.
 
 ```scss
 @use "bootstrap-flexoki/src/bootstrap-flexoki" with (
@@ -66,7 +70,12 @@ light mode (4.39:1 and 4.43:1) and for red in dark mode (4.42:1). The tests list
 
 Use Node.js 26 and install dependencies with `npm ci`.
 
-- `npm run build`: compile `dist/bootstrap-flexoki.css` and `dist/flexoki.css`.
+- `npm run build`: compile `dist/bootstrap-flexoki.css` and `dist/flexoki.css`, then prefix
+  custom properties with `--bs-` as Bootstrap's build does.
+- `npm run demo`: build, then serve the repository at <http://localhost:9001/demo/>.
+- `npm run demo:sync`: download Bootstrap's
+  [cheatsheet](https://getbootstrap.com/docs/6.0/examples/cheatsheet/) into `demo/` and point it
+  at this theme.
 - `npm run tokens:sync`: regenerate `src/_tokens.scss` from the Flexoki commit pinned in
   `scripts/sync-tokens.js`. Pass a path to a local `flexoki.css` to use that instead.
 - `npm run format:fix`: format files with Oxfmt.
@@ -77,4 +86,6 @@ Use Node.js 26 and install dependencies with `npm ci`.
 - `npm run fix`: fix SCSS lint problems, then format files.
 - `npm test`: run the build, formatting, lint and unit checks through Wireit.
 
-Open `demo/index.html` after building to see the theme in light and dark mode.
+The demo is Bootstrap's cheatsheet, which shows every component, with a light and dark mode
+toggle. It's copyright the Bootstrap Authors and licensed under
+[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
