@@ -16,23 +16,49 @@
     "type": "git",
     "url": "git+https://github.com/pspeter3/bootstrap-flexoki.git"
   },
+  "style": "dist/bootstrap-flexoki.css",
+  "files": [
+    "dist",
+    "src"
+  ],
   "type": "module",
   "scripts": {
+    "build": "wireit",
     "fix": "wireit",
     "test": "wireit",
+    "prepack": "wireit",
+    "tokens:sync": "node scripts/sync-tokens.js",
     "format:fix": "wireit",
     "format:test": "wireit",
     "lint:fix": "wireit",
-    "lint:test": "wireit"
+    "lint:test": "wireit",
+    "unit:test": "wireit"
   },
   "wireit": {
+    "build": {
+      "command": "sass --load-path=node_modules --quiet-deps --no-source-map src/bootstrap-flexoki.scss:dist/bootstrap-flexoki.css src/flexoki.scss:dist/flexoki.css",
+      "files": [
+        "src/**/*.scss",
+        "node_modules/bootstrap/scss/**/*.scss"
+      ],
+      "output": [
+        "dist/**"
+      ]
+    },
+    "prepack": {
+      "dependencies": [
+        "build"
+      ]
+    },
     "fix": {
       "command": "npm run lint:fix && npm run format:fix"
     },
     "test": {
       "dependencies": [
+        "build",
         "format:test",
-        "lint:test"
+        "lint:test",
+        "unit:test"
       ]
     },
     "format:fix": {
@@ -56,12 +82,27 @@
         ".gitignore"
       ],
       "output": []
+    },
+    "unit:test": {
+      "command": "node --test",
+      "files": [
+        "src/**/*.scss",
+        "test/**/*.js",
+        "node_modules/bootstrap/scss/**/*.scss"
+      ],
+      "output": []
     }
   },
   "devDependencies": {
+    "bootstrap": "6.0.0-alpha.1",
     "oxfmt": "^0.74.0",
+    "sass": "^1.106.1",
     "stylelint": "^17.16.0",
     "stylelint-config-standard-scss": "^17.0.0",
     "wireit": "^0.14.13"
-  }
+  },
+  "peerDependencies": {
+    "bootstrap": "6.0.0-alpha.1"
+  },
+  "sass": "src/bootstrap-flexoki.scss"
 }

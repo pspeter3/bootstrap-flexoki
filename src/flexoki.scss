@@ -1,0 +1,17 @@
+@use "tokens";
+
+:root,
+:host {
+  --flexoki-paper: #{tokens.$paper};
+  --flexoki-black: #{tokens.$black};
+
+  @each $shade, $value in tokens.$base {
+    --flexoki-base-#{$shade}: #{$value};
+  }
+
+  @each $hue, $shades in tokens.$accents {
+    @each $shade, $value in $shades {
+      --flexoki-#{$hue}-#{$shade}: #{$value};
+    }
+  }
+}

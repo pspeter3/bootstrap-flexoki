@@ -1,0 +1,134 @@
+@use "sass:color";
+@use "sass:map";
+@use "sass:math";
+@use "colors";
+@use "tokens";
+
+// References a Flexoki shade's Bootstrap token, e.g. var(--blue-600).
+@function shade($hue, $shade) {
+  @return var(--#{$hue}-#{colors.stop($shade)});
+}
+
+// A light-dark() pair of shades from one hue.
+@function pair($hue, $light, $dark) {
+  @return light-dark(shade($hue, $light), shade($hue, $dark));
+}
+
+@function luminance($color) {
+  $sum: 0;
+
+  @each $channel, $weight in ("red": 0.2126, "green": 0.7152, "blue": 0.0722) {
+    $value: math.div(color.channel($color, $channel, $space: rgb), 255);
+
+    // No 8-bit channel falls between 0.04 and the sRGB threshold of 0.04045.
+    @if $value <= 0.04 {
+      $value: math.div($value, 12.92);
+    } @else {
+      $value: math.pow(math.div($value + 0.055, 1.055), 2.4);
+    }
+
+    $sum: $sum + $value * $weight;
+  }
+
+  @return $sum;
+}
+
+@function contrast-ratio($a, $b) {
+  $lighter: math.max(luminance($a), luminance($b));
+  $darker: math.min(luminance($a), luminance($b));
+
+  @return math.div($lighter + 0.05, $darker + 0.05);
+}
+
+// Paper or black, whichever reads better on the background.
+@function contrast($background) {
+  @if contrast-ratio($background, tokens.$paper) >= contrast-ratio($background, tokens.$black) {
+    @return var(--white);
+  }
+
+  @return var(--black);
+}
+
+// Flexoki uses 600 for accents in light mode and 400 in dark mode, with the
+// other shade as the secondary accent.
+@function theme-color($hue) {
+  $shades: map.get(tokens.$accents, $hue);
+
+  @return (
+    "base": pair($hue, 600, 400),
+    "fg": pair($hue, 600, 400),
+    "fg-emphasis": pair($hue, 800, 200),
+    "bg": pair($hue, 600, 400),
+    "bg-subtle": pair($hue, 50, 950),
+    "bg-muted": pair($hue, 100, 900),
+    "border": pair($hue, 200, 800),
+    "focus-ring": pair($hue, 400, 600),
+    "contrast": light-dark(contrast(map.get($shades, 600)), contrast(map.get($shades, 400)))
+  );
+}
+
+$theme-colors: (
+  "primary": theme-color("blue"),
+  "accent": theme-color("purple"),
+  "success": theme-color("green"),
+  "danger": theme-color("red"),
+  "warning": theme-color("orange"),
+  "info": theme-color("cyan"),
+  "inverse": (
+    "base": light-dark(var(--black), var(--gray-200)),
+    "fg": light-dark(var(--black), var(--gray-200)),
+    "fg-emphasis": light-dark(var(--black), var(--white)),
+    "bg": light-dark(var(--black), var(--gray-200)),
+    "bg-subtle": pair("gray", 100, 900),
+    "bg-muted": pair("gray", 200, 800),
+    "border": pair("gray", 300, 700),
+    "focus-ring": pair("gray", 600, 500),
+    "contrast": light-dark(var(--white), var(--black)),
+  ),
+  "secondary": (
+    "base": pair("gray", 150, 850),
+    "fg": pair("gray", 600, 500),
+    "fg-emphasis": light-dark(var(--black), var(--gray-200)),
+    "bg": pair("gray", 100, 900),
+    "bg-subtle": pair("gray", 50, 950),
+    "bg-muted": pair("gray", 150, 850),
+    "border": pair("gray", 200, 800),
+    "focus-ring": pair("gray", 300, 700),
+    "contrast": light-dark(var(--black), var(--gray-200)),
+  ),
+);
+
+// Flexoki's bg, bg-2, ui, ui-2 and ui-3.
+$theme-bgs: (
+  "body": light-dark(var(--white), var(--black)),
+  "1": pair("gray", 50, 950),
+  "2": pair("gray", 100, 900),
+  "3": pair("gray", 150, 850),
+  "4": pair("gray", 200, 800),
+);
+
+// Flexoki's tx, tx-2 and tx-3. Bootstrap has two more levels, which step
+// between tx and tx-2.
+$theme-fgs: (
+  "body": light-dark(var(--black), var(--gray-200)),
+  "1": pair("gray", 800, 300),
+  "2": pair("gray", 700, 400),
+  "3": pair("gray", 600, 500),
+  "4": pair("gray", 300, 700),
+);
+
+// Flexoki's ui, ui-2 and ui-3 are for borders, hovered borders and active borders.
+$theme-borders: (
+  "subtle": pair("gray", 100, 900),
+  "muted": pair("gray", 100, 900),
+  "body": pair("gray", 150, 850),
+  "emphasized": pair("gray", 200, 800),
+);
+
+// Bootstrap's global tokens.
+$root-tokens: (
+  --border-color: pair("gray", 150, 850),
+  --link-hover-color: var(--primary-fg-emphasis),
+  --code-color: pair("magenta", 600, 400),
+  --shadow-color: var(--black),
+);

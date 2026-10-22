@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bootstrap Flexoki</title>
+    <link rel="stylesheet" href="../dist/bootstrap-flexoki.css" />
+    <style>
+      .swatches {
+        display: grid;
+        grid-template-columns: 5rem repeat(13, 1fr);
+        gap: 2px;
+        font-size: var(--font-size-xs);
+      }
+
+      .swatch {
+        height: 2rem;
+        border-radius: var(--radius-2);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container py-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Bootstrap Flexoki</h1>
+        <div class="btn-group" role="group" aria-label="Color scheme">
+          <button type="button" class="btn btn-outline theme-secondary" data-scheme="light">
+            Light
+          </button>
+          <button type="button" class="btn btn-outline theme-secondary" data-scheme="dark">
+            Dark
+          </button>
+        </div>
+      </div>
+
+      <h2 class="mt-5 mb-3">Palette</h2>
+      <div class="swatches" id="swatches"></div>
+
+      <h2 class="mt-5 mb-3">Text</h2>
+      <p class="fg-body">Body text uses tx.</p>
+      <p class="fg-1">Level 1 steps between tx and tx-2.</p>
+      <p class="fg-2">Level 2 steps between tx and tx-2.</p>
+      <p class="fg-3">Level 3 uses tx-2 for muted text.</p>
+      <p class="fg-4">Level 4 uses tx-3 for faint text.</p>
+      <p>A <a href="#">link</a> and some <code>inline code</code>.</p>
+
+      <h2 class="mt-5 mb-3">Buttons</h2>
+      <div id="buttons" class="vstack gap-2"></div>
+
+      <h2 class="mt-5 mb-3">Badges</h2>
+      <div id="badges" class="d-flex flex-wrap gap-2"></div>
+
+      <h2 class="mt-5 mb-3">Alerts</h2>
+      <div id="alerts"></div>
+
+      <h2 class="mt-5 mb-3">Forms</h2>
+      <form class="vstack gap-3" style="max-width: 32rem">
+        <div>
+          <label class="form-label" for="email">Email</label>
+          <input class="form-control" id="email" type="email" placeholder="name@example.com" />
+        </div>
+        <div>
+          <label class="form-label" for="message">Message</label>
+          <textarea class="form-control" id="message" rows="2"></textarea>
+        </div>
+        <label class="d-flex gap-2"
+          ><input class="check" type="checkbox" checked /> Checked checkbox</label
+        >
+        <label class="d-flex gap-2"
+          ><input class="radio" type="radio" name="radio" checked /> Selected radio</label
+        >
+        <label class="d-flex gap-2"
+          ><span class="switch"><input type="checkbox" checked /></span> Switch</label
+        >
+        <div class="form-range">
+          <input class="form-range-input" type="range" aria-label="Range" />
+        </div>
+      </form>
+
+      <h2 class="mt-5 mb-3">Components</h2>
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">Card header</div>
+            <div class="card-body">
+              <h3 class="card-title fs-5">Card title</h3>
+              <p class="fg-3">Cards sit on bg with a ui-2 border.</p>
+              <button type="button" class="btn btn-solid theme-primary">Action</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <ul class="list-group">
+            <li class="list-group-item">First item</li>
+            <li class="list-group-item">Second item</li>
+            <li class="list-group-item">Third item</li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <ul class="nav nav-tabs">
+            <li class="nav-item"><a class="nav-link active" href="#">Active</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <div class="progress" role="progressbar" aria-label="Progress" aria-valuenow="60">
+            <div class="progress-bar" style="width: 60%"></div>
+          </div>
+        </div>
+        <div class="col-12">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Light</th>
+                <th>Dark</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>bg</td>
+                <td>paper</td>
+                <td>black</td>
+              </tr>
+              <tr>
+                <td>ui</td>
+                <td>base-100</td>
+                <td>base-900</td>
+              </tr>
+              <tr>
+                <td>tx</td>
+                <td>black</td>
+                <td>base-200</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+    <script>
+      const hues = [
+        "gray",
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "cyan",
+        "blue",
+        "purple",
+        "magenta",
+      ];
+      const stops = [
+        "050",
+        "100",
+        "150",
+        "200",
+        "300",
+        "400",
+        "500",
+        "600",
+        "700",
+        "800",
+        "850",
+        "900",
+        "950",
+      ];
+      const themes = [
+        "primary",
+        "accent",
+        "success",
+        "danger",
+        "warning",
+        "info",
+        "secondary",
+        "inverse",
+      ];
+
+      const swatches = document.getElementById("swatches");
+      swatches.append(document.createElement("span"));
+      for (const stop of stops) {
+        swatches.append(Object.assign(document.createElement("span"), { textContent: stop }));
+      }
+      for (const hue of hues) {
+        swatches.append(Object.assign(document.createElement("span"), { textContent: hue }));
+        for (const stop of stops) {
+          const swatch = document.createElement("span");
+          swatch.className = "swatch";
+          swatch.style.background = `var(--${hue}-${stop})`;
+          swatches.append(swatch);
+        }
+      }
+
+      const buttons = document.getElementById("buttons");
+      for (const variant of ["solid", "outline", "subtle", "text"]) {
+        const row = document.createElement("div");
+        row.className = "d-flex flex-wrap gap-2";
+        for (const theme of themes) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `btn btn-${variant} theme-${theme}`;
+          button.textContent = theme;
+          row.append(button);
+        }
+        buttons.append(row);
+      }
+
+      const badges = document.getElementById("badges");
+      for (const variant of ["", "badge-subtle", "badge-outline"]) {
+        for (const theme of themes) {
+          const badge = document.createElement("span");
+          badge.className = `badge ${variant} theme-${theme}`;
+          badge.textContent = theme;
+          badges.append(badge);
+        }
+      }
+
+      const alerts = document.getElementById("alerts");
+      for (const theme of themes.slice(0, 6)) {
+        const alert = document.createElement("div");
+        alert.className = `alert theme-${theme}`;
+        alert.innerHTML = `A ${theme} alert with <a class="alert-link" href="#">a link</a>.`;
+        alerts.append(alert);
+      }
+
+      const params = new URLSearchParams(location.search);
+      const setScheme = (scheme) => document.documentElement.setAttribute("data-bs-theme", scheme);
+      if (params.has("scheme")) setScheme(params.get("scheme"));
+      for (const button of document.querySelectorAll("[data-scheme]")) {
+        button.addEventListener("click", () => setScheme(button.dataset.scheme));
+      }
+    </script>
+  </body>
+</html>
