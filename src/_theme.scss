@@ -53,12 +53,13 @@
 // other shade as the secondary accent.
 @function theme-color($hue) {
   $shades: map.get(tokens.$accents, $hue);
+  $accent: pair($hue, 600, 400);
 
   @return (
-    "base": pair($hue, 600, 400),
-    "fg": pair($hue, 600, 400),
+    "base": $accent,
+    "fg": $accent,
     "fg-emphasis": pair($hue, 800, 200),
-    "bg": pair($hue, 600, 400),
+    "bg": $accent,
     "bg-subtle": pair($hue, 50, 950),
     "bg-muted": pair($hue, 100, 900),
     "border": pair($hue, 200, 800),
@@ -118,6 +119,7 @@ $theme-fgs: (
 );
 
 // Flexoki's ui, ui-2 and ui-3 are for borders, hovered borders and active borders.
+// Flexoki has no shade between 100 and ui's 150, so subtle and muted share 100.
 $theme-borders: (
   "subtle": pair("gray", 100, 900),
   "muted": pair("gray", 100, 900),

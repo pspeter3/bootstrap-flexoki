@@ -1,9 +1,8 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
+import { HUES, SHADES, stop } from "../scripts/palette.ts";
 
-const HUES = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "magenta"];
-const SHADES = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 850, 900, 950];
 const REMOVED_HUES = ["indigo", "violet", "pink", "amber", "lime", "teal", "brown", "pewter"];
 const THEME_COLORS: Record<string, string> = {
   primary: "blue",
@@ -41,10 +40,6 @@ const tokens: Record<string, string> = Object.fromEntries(
 const properties: Record<string, string> = {};
 for (const [, name, value] of theme.matchAll(/--bs-([a-z0-9-]+):\s*([^;]+);/g)) {
   properties[`--${name}`] ??= value.replaceAll("var(--bs-", "var(--").trim();
-}
-
-function stop(shade: number): string {
-  return shade < 100 ? `0${shade}` : `${shade}`;
 }
 
 function splitArguments(value: string): string[] {

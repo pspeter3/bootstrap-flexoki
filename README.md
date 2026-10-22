@@ -19,7 +19,7 @@ which Bootstrap's JavaScript relies on.
 
 Or compile it with Sass, adding `node_modules` to your load paths. The module forwards
 Bootstrap, so you can configure it the same way. As with Bootstrap, Sass output has no
-`--bs-` prefix: run the same PostCSS step as `postcss.config.js` to add it.
+`--bs-` prefix: run the same PostCSS step as `.postcssrc.json` to add it.
 
 ```scss
 @use "bootstrap-flexoki/src/bootstrap-flexoki" with (
@@ -72,7 +72,8 @@ Use Node.js 26 and install dependencies with `npm ci`. The scripts and tests are
 which Node.js runs directly by stripping the types.
 
 - `npm run build`: compile `dist/bootstrap-flexoki.css` and `dist/flexoki.css`, then prefix
-  custom properties with `--bs-` as Bootstrap's build does.
+  the theme's custom properties with `--bs-` as Bootstrap's build does. Bootstrap's JavaScript
+  reads some of them, such as `--bs-breakpoint-md`.
 - `npm run demo:build`: build the demo site in `_site/`.
 - `npm run demo`: build the demo, then serve it at <http://localhost:9001/>.
 - `npm run tokens:sync`: regenerate `src/_tokens.scss` from the Flexoki commit pinned in
